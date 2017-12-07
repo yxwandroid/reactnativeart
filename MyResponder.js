@@ -10,6 +10,7 @@ import {
 const {
     Shape,
     Surface,
+    Group,
     Path
 } = ART
 //获取屏幕的宽高
@@ -25,10 +26,14 @@ export default class MyResponder extends PureComponent {
 
         };
 
+        this.MousePostion = {
+            firstX:0,
+            firstY:0,
+            x: 0,
+            y: 0
+        }
         this.firstX = 0;
         this.firstY = 0;
-        this.MousePostion = {x: 0, y: 0}
-
         this.MousePostions = []
     }
 
@@ -42,31 +47,24 @@ export default class MyResponder extends PureComponent {
                 return true;
             },
             onPanResponderGrant: (evt, gestureState) => {
-                // console.log(`Grant:  firstX: ${evt.nativeEvent.pageX}   firstY : ${evt.nativeEvent.pageY}`);
                 console.log('-------------Grant-----------------');
 
-                this.firstX = evt.nativeEvent.pageX;
-                this.firstY = evt.nativeEvent.pageY;
-
-                this.MousePostion = {
-                    x: this.firstX,
-                    y: this.firstY
-                }
-                this.MousePostions.push(this.MousePostion);
-
+                this.firstX = evt.nativeEvent.pageX
+                this.firstY = evt.nativeEvent.pageY
             },//激活时做的动作
             onPanResponderMove: (evt, gestureState) => {
-                // console.log(`dx : ${gestureState.dx}   dy : ${gestureState.dy}`);
 
                 this.MousePostion = {
+                    firstX:this.firstX,
+                    firstY:this.firstY,
                     x: this.firstX + gestureState.dx,
                     y: this.firstY + gestureState.dy
                 }
                 this.MousePostions.push(this.MousePostion);
 
                 this.setState({
-                    lastX: this.firstX + gestureState.dx,
-                    lastY: this.firstY + gestureState.dy,
+                    lastX: this.MousePostions[0].x + gestureState.dx,
+                    lastY: this.MousePostions[0].y + gestureState.dy,
                 })
 
 
@@ -74,7 +72,8 @@ export default class MyResponder extends PureComponent {
 
             onPanResponderRelease: (evt, gestureState) => {
                 console.log('-----------------Release----------------');
-                this.MousePostions = []
+                //  this.AllPostions.push(this.MousePostions)
+                // this.MousePostions = []
             },///动作释放后做的动作
 
             onPanResponderTerminate: (evt, gestureState) => {
@@ -86,22 +85,43 @@ export default class MyResponder extends PureComponent {
 
     render() {
 
-        const path = new Path()
+        const path = new Path();
         for (let i = 0; i < this.MousePostions.length; i++) {
+            let tempFistX = this.MousePostions[i].firstX
+            let tempFistY = this.MousePostions[i].firstY
             let tempX = this.MousePostions[i].x
             let tempY = this.MousePostions[i].y
+
             if (i == 0) {
-                path.moveTo(tempX, tempY)
-            } else {
+                path.moveTo(tempFistX, tempFistY)
                 path.lineTo(tempX, tempY)
+                path.close();
+            } else {
+                let tempFistX_1 = this.MousePostions[i-1].firstX
+
+                if(tempFistX==tempFistX_1){
+                    let tempX_1 = this.MousePostions[i - 1].x
+                    let tempY_1 = this.MousePostions[i - 1].y
+                    path.moveTo(tempX_1, tempY_1)
+                    path.lineTo(tempX, tempY)
+                    path.close();
+                }else {
+                    path.moveTo(tempFistX, tempFistY)
+                    path.lineTo(tempX, tempY)
+                    path.close();
+                }
+
+
             }
 
-
         }
+
         return (
             <View style={styles.container} {...this._panResponder.panHandlers} >
                 <Surface width={width} height={height}>
-                    <Shape d={path} stroke="#000000" strokeWidth={1}/>
+                    <Group>
+                        <Shape d={path} stroke="#000000" strokeWidth={1}/>
+                    </Group>
                 </Surface>
             </View>
         );
