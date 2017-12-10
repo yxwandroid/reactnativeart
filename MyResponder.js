@@ -22,7 +22,6 @@ export default class MyResponder extends PureComponent {
         super(props);
         this.state = {
             lastX: 0,
-            lastY: 0
 
         };
 
@@ -32,8 +31,6 @@ export default class MyResponder extends PureComponent {
             x: 0,
             y: 0
         }
-        this.firstX = 0;
-        this.firstY = 0;
         this.MousePostions = []
     }
 
@@ -47,33 +44,27 @@ export default class MyResponder extends PureComponent {
                 return true;
             },
             onPanResponderGrant: (evt, gestureState) => {
-                console.log('-------------Grant-----------------');
-
-                this.firstX = evt.nativeEvent.pageX
-                this.firstY = evt.nativeEvent.pageY
+                this.tempfirstX = evt.nativeEvent.pageX
+                this.tempFirstY = evt.nativeEvent.pageY
             },//激活时做的动作
             onPanResponderMove: (evt, gestureState) => {
 
                 this.MousePostion = {
-                    firstX:this.firstX,
-                    firstY:this.firstY,
-                    x: this.firstX + gestureState.dx,
-                    y: this.firstY + gestureState.dy
+                    firstX:this.tempfirstX,
+                    firstY:this.tempFirstY,
+                    x: this.tempfirstX + gestureState.dx,
+                    y: this.tempFirstY + gestureState.dy
                 }
                 this.MousePostions.push(this.MousePostion);
 
                 this.setState({
                     lastX: this.MousePostions[0].x + gestureState.dx,
-                    lastY: this.MousePostions[0].y + gestureState.dy,
                 })
 
 
             }, //移动时作出的动作
 
             onPanResponderRelease: (evt, gestureState) => {
-                console.log('-----------------Release----------------');
-                //  this.AllPostions.push(this.MousePostions)
-                // this.MousePostions = []
             },///动作释放后做的动作
 
             onPanResponderTerminate: (evt, gestureState) => {
