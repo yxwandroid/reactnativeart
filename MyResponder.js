@@ -21,16 +21,19 @@ export default class MyResponder extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            //用于更新界面
             lastX: 0,
 
         };
 
+        //每次移动的临时数组
         this.MousePostion = {
-            firstX:0,
-            firstY:0,
-            x: 0,
-            y: 0
+            firstX:0, //起点 X 坐标
+            firstY:0,// 起点 Y 坐标
+            x: 0,   //经过路径的x坐标
+            y: 0    //经过路径的y坐标
         }
+        //path 全部路径数组
         this.MousePostions = []
     }
 
@@ -44,11 +47,13 @@ export default class MyResponder extends PureComponent {
                 return true;
             },
             onPanResponderGrant: (evt, gestureState) => {
+                //手指按下时的画笔起点坐标
                 this.tempfirstX = evt.nativeEvent.pageX
                 this.tempFirstY = evt.nativeEvent.pageY
             },//激活时做的动作
             onPanResponderMove: (evt, gestureState) => {
 
+                //
                 this.MousePostion = {
                     firstX:this.tempfirstX,
                     firstY:this.tempFirstY,
@@ -57,6 +62,7 @@ export default class MyResponder extends PureComponent {
                 }
                 this.MousePostions.push(this.MousePostion);
 
+                //更新界面
                 this.setState({
                     lastX: this.MousePostions[0].x + gestureState.dx,
                 })
@@ -82,7 +88,6 @@ export default class MyResponder extends PureComponent {
             let tempFistY = this.MousePostions[i].firstY
             let tempX = this.MousePostions[i].x
             let tempY = this.MousePostions[i].y
-
             if (i == 0) {
                 path.moveTo(tempFistX, tempFistY)
                 path.lineTo(tempX, tempY)
